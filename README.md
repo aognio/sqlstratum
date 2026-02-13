@@ -1,7 +1,7 @@
 # SQLStratum
 
 <p align="center">
-  <img src="assets/images/SQLStratum-Logo-500x500-transparent.png" alt="SQLStratum logo" />
+  <img src="https://raw.githubusercontent.com/aognio/sqlstratum/main/assets/images/SQLStratum-Logo-500x500-transparent.png" alt="SQLStratum logo" />
 </p>
 
 SQLStratum is a modern, typed, deterministic SQL query builder and compiler for Python with a 
@@ -49,7 +49,7 @@ q = (
     SELECT(users.c.id, users.c.email)
     .FROM(users)
     .WHERE(users.c.active.is_true())
-    .HYDRATE(dict)
+    .hydrate(dict)
 )
 
 rows = runner.fetch_all(q)
@@ -58,7 +58,7 @@ print(rows)
 
 ## Why `Table` objects?
 SQLStratum’s `Table` objects are the schema anchor for the typed, deterministic query builder. They
-provides column metadata and a stable namespace for column access, which enables predictable SQL
+provide column metadata and a stable namespace for column access, which enables predictable SQL
 generation and safe parameter binding. They also support explicit aliasing to avoid ambiguous column
 names in joins.
 
@@ -66,7 +66,7 @@ names in joins.
 - AST: immutable query nodes in `sqlstratum/ast.py`
 - Compiler: SQL + params generation in `sqlstratum/compile.py`
 - Runner: SQLite execution and transactions in `sqlstratum/runner.py`
-- Hydration: projection rules and targets in `sqlstratum/hydrate.py`
+- Hydration: projection rules and targets in `sqlstratum/hydrate/`
 
 ## SQL Debugging
 SQLStratum can log executed SQL statements (compiled SQL + parameters + duration), but logging is
@@ -102,6 +102,33 @@ SQL: <compiled sql> | params={<sorted params>} | duration_ms=<...>
 Architectural intent: logging happens at the Runner boundary (after execution). AST building and
 compilation remain deterministic and side-effect free, preserving separation of concerns.
 
+## Pydantic Hydration (Optional)
+SQLStratum does not depend on Pydantic, but it provides an optional hydration adapter for Pydantic
+v2 models.
+
+Install:
+```
+pip install sqlstratum[pydantic]
+```
+
+Example:
+```python
+from pydantic import BaseModel
+from sqlstratum.hydrate.pydantic import hydrate_model, using_pydantic
+
+class User(BaseModel):
+    id: int
+    email: str
+
+row = {"id": "1", "email": "a@b.com"}
+user = hydrate_model(User, row)
+
+q = using_pydantic(
+    SELECT(users.c.id, users.c.email).FROM(users).WHERE(users.c.id == 1)
+).hydrate(User)
+user_row = runner.fetch_one(q)
+```
+
 ## Logo Inspiration
 
 Vinicunca (Rainbow Mountain) in Peru’s Cusco Region — a high-altitude day hike from
@@ -109,7 +136,7 @@ Cusco at roughly 5,036 m (16,500 ft). See [Vinicunca](https://en.wikipedia.org/w
 background.
 
 ## Versioning / Roadmap
-Current version: `0.1.0`.
+Current version: `0.1.1`.
 Design notes and current limitations are tracked in `NOTES.md`. Roadmap planning is intentionally
 minimal at this stage and will evolve with real usage.
 

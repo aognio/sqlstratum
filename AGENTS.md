@@ -18,7 +18,7 @@ predictable parameter binding.
 - `sqlstratum/dsl.py`: public DSL constructors and chaining helpers
 - `sqlstratum/compile.py`: AST -> SQL + params compilation
 - `sqlstratum/runner.py`: SQLite execution boundary + transactions
-- `sqlstratum/hydrate.py`: hydration targets + projection key rules
+- `sqlstratum/hydrate/`: hydration targets + projection key rules
 - `tests/`: compile, hydration, runner, and SQLite integration tests
 - `examples/`: minimal usage demos
 

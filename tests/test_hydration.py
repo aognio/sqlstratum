@@ -30,7 +30,7 @@ class TestHydration(unittest.TestCase):
         self.conn.close()
 
     def test_dict_and_json(self):
-        q = SELECT(users.c.id, users.c.email).FROM(users).WHERE(users.c.id == 1).HYDRATE(dict)
+        q = SELECT(users.c.id, users.c.email).FROM(users).WHERE(users.c.id == 1).hydrate(dict)
         rows = self.runner.fetch_all(q)
         self.assertEqual(rows, [{"id": 1, "email": "a@b.com"}])
         json.dumps(rows)
@@ -41,12 +41,12 @@ class TestHydration(unittest.TestCase):
             id: int
             email: str
 
-        q = SELECT(users.c.id, users.c.email).FROM(users).WHERE(users.c.id == 1).HYDRATE(User)
+        q = SELECT(users.c.id, users.c.email).FROM(users).WHERE(users.c.id == 1).hydrate(User)
         row = self.runner.fetch_one(q)
         self.assertEqual(row, User(id=1, email="a@b.com"))
 
     def test_callable(self):
-        q = SELECT(users.c.id, users.c.email).FROM(users).WHERE(users.c.id == 1).HYDRATE(
+        q = SELECT(users.c.id, users.c.email).FROM(users).WHERE(users.c.id == 1).hydrate(
             lambda m: f"{m['id']}:{m['email']}"
         )
         row = self.runner.fetch_one(q)

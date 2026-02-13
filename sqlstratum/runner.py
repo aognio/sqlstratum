@@ -87,7 +87,7 @@ class Runner:
         rows = cur.fetchall()
         if log_enabled:
             _debug_log(compiled, (time.perf_counter() - start) * 1000)
-        return hydrate_rows(rows, query.projections, query.hydrate or dict)
+        return hydrate_rows(rows, query.projections, query.hydration or dict)
 
     def fetch_one(self, query: ast.SelectQuery) -> Optional[Any]:
         compiled = compile(query)
@@ -100,7 +100,7 @@ class Runner:
             _debug_log(compiled, (time.perf_counter() - start) * 1000)
         if row is None:
             return None
-        return hydrate_rows([row], query.projections, query.hydrate or dict)[0]
+        return hydrate_rows([row], query.projections, query.hydration or dict)[0]
 
     def scalar(self, query: ast.SelectQuery) -> Optional[Any]:
         compiled = compile(query)

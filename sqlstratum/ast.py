@@ -27,7 +27,7 @@ class SelectQuery:
     limit: Optional[int]
     offset: Optional[int]
     distinct: bool
-    hydrate: HydrationTarget
+    hydration: HydrationTarget
 
 
 @dataclass(frozen=True)

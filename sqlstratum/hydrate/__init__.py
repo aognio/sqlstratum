@@ -4,9 +4,9 @@ from __future__ import annotations
 from dataclasses import is_dataclass
 from typing import Any, Dict, Iterable, List, Mapping, Sequence
 
-from .expr import AliasExpr, Function
-from .meta import Column
-from .types import HydrationTarget
+from ..expr import AliasExpr, Function
+from ..meta import Column
+from ..types import HydrationTarget
 
 
 class HydrationError(ValueError):

@@ -22,7 +22,7 @@ def SELECT(*projections: Expression) -> SelectQuery:
         limit=None,
         offset=None,
         distinct=False,
-        hydrate=None,
+        hydration=None,
     )
 
 
@@ -100,7 +100,7 @@ def _as(self: SelectQuery, alias: str) -> Subquery:
 
 
 def _hydrate(self: SelectQuery, target: HydrationTarget) -> SelectQuery:
-    return replace(self, hydrate=target)
+    return replace(self, hydration=target)
 
 
 SelectQuery.FROM = _from  # type: ignore[attr-defined]
@@ -114,7 +114,7 @@ SelectQuery.LIMIT = _limit  # type: ignore[attr-defined]
 SelectQuery.OFFSET = _offset  # type: ignore[attr-defined]
 SelectQuery.DISTINCT = _distinct  # type: ignore[attr-defined]
 SelectQuery.AS = _as  # type: ignore[attr-defined]
-SelectQuery.HYDRATE = _hydrate  # type: ignore[attr-defined]
+SelectQuery.hydrate = _hydrate  # type: ignore[attr-defined]
 
 
 class InsertBuilder:
