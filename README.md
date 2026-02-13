@@ -152,3 +152,21 @@ MIT License.
 
 ## Contributing
 PRs are welcome. Please read `CONTRIBUTING.md` for the workflow and expectations.
+
+## Documentation
+Install docs dependencies:
+```bash
+python -m pip install -r docs/requirements.txt
+```
+
+Run the local docs server:
+```bash
+mkdocs serve
+```
+
+Build the static site:
+```bash
+mkdocs build --clean
+```
+
+Read the Docs will build documentation automatically once the repository is imported.

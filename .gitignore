@@ -69,6 +69,9 @@ instance/
 _docs/_build/
 docs/_build/
 
+# MkDocs site output
+site/
+
 # PyBuilder
 .pybuilder/
 
