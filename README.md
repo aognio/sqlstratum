@@ -1,6 +1,8 @@
 # SQLStratum
 
-![SQLStratum logo](assets/images/SQLStratum-Logo-500x500-transparent.png)
+<p align="center">
+  <img src="assets/images/SQLStratum-Logo-500x500-transparent.png" alt="SQLStratum logo" />
+</p>
 
 SQLStratum is a modern, typed, deterministic SQL query builder and compiler for Python with a 
 SQLite runner and a hydration pipeline. It exists to give applications and ORMs a reliable foundation 
@@ -106,7 +108,7 @@ Design notes and current limitations are tracked in `NOTES.md`. Roadmap planning
 minimal at this stage and will evolve with real usage.
 
 ## Authorship
-Antonio Ognio is the maintainer and author of SQLStratum. ChatGPT is used for brainstorming,
+[Antonio Ognio](https://github.com/aognio/) is the maintainer and author of SQLStratum. ChatGPT is used for brainstorming,
 architectural thinking, documentation drafting, and project management advisory. Codex (CLI/agentic
 coding) is used to implement many code changes under Antonio's direction and review. The maintainer
 reviews and curates changes; AI tools are assistants, not owners, and accountability remains with the
