@@ -102,6 +102,12 @@ SQL: <compiled sql> | params={<sorted params>} | duration_ms=<...>
 Architectural intent: logging happens at the Runner boundary (after execution). AST building and
 compilation remain deterministic and side-effect free, preserving separation of concerns.
 
+## Logo Inspiration
+
+Vinicunca (Rainbow Mountain) in Peru’s Cusco Region — a high-altitude day hike from
+Cusco at roughly 5,036 m (16,500 ft). See [Vinicunca](https://en.wikipedia.org/wiki/Vinicunca) for
+background.
+
 ## Versioning / Roadmap
 Current version: `0.1.0`.
 Design notes and current limitations are tracked in `NOTES.md`. Roadmap planning is intentionally
