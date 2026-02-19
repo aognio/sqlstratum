@@ -36,3 +36,19 @@ ideas. Human review is still expected; AI-generated contributions must be review
 - No raw SQL string interpolation; use parameters exclusively
 - Tests are required for every change
 - Be cautious about backward compatibility
+
+## Release Workflow
+Install dev tooling:
+```bash
+python -m pip install -e ".[dev]"
+```
+
+Run the automated release command:
+```bash
+poe release
+```
+
+The `poe release` task executes:
+1. `python -m build --no-isolation`
+2. `python -m twine check dist/*`
+3. `python -m twine upload dist/*`

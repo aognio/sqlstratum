@@ -136,7 +136,7 @@ Cusco at roughly 5,036 m (16,500 ft). See [Vinicunca](https://en.wikipedia.org/w
 background.
 
 ## Versioning / Roadmap
-Current version: `0.1.1`.
+Current version: `0.2.0`.
 Design notes and current limitations are tracked in `NOTES.md`. Roadmap planning is intentionally
 minimal at this stage and will evolve with real usage.
 
@@ -170,3 +170,19 @@ mkdocs build --clean
 ```
 
 Read the Docs will build documentation automatically once the repository is imported.
+
+## Release Automation
+Install dev dependencies:
+```bash
+python -m pip install -e ".[dev]"
+```
+
+Run the full release pipeline:
+```bash
+poe release
+```
+
+This runs, in order:
+- `python -m build --no-isolation`
+- `python -m twine check dist/*`
+- `python -m twine upload dist/*`

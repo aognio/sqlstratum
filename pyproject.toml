@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sqlstratum"
-version = "0.1.1"
+version = "0.2.0"
 description = "Lightweight, source-first SQL AST + compiler + runner."
 readme = { file = "README.md", content-type = "text/markdown" }
 license = { file = "LICENSE" }
@@ -37,6 +37,7 @@ Issues = "https://github.com/aognio/sqlstratum/issues"
 [project.optional-dependencies]
 dev = [
   "build>=1.2.0",
+  "poethepoet>=0.30.0",
   "twine>=5.0.0",
 ]
 pydantic = [
@@ -45,3 +46,9 @@ pydantic = [
 
 [tool.setuptools]
 packages = ["sqlstratum", "sqlstratum.hydrate"]
+
+[tool.poe.tasks]
+release-build.cmd = "python -m build --no-isolation"
+release-check.cmd = "python -m twine check dist/*"
+release-upload.cmd = "python -m twine upload dist/*"
+release.sequence = ["release-build", "release-check", "release-upload"]

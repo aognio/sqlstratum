@@ -42,3 +42,8 @@ predictable parameter binding.
 
 ## Debugging Ergonomics
 - `SQLSTRATUM_DEBUG=1` enables per-query logging at the Runner boundary (requires logging level DEBUG)
+
+## Security & Path Hygiene
+- Never include absolute local filesystem paths in generated docs, release notes, examples, or prompts.
+- Use project-relative paths only (for example: `README.md`, `docs/`, `sqlstratum/compile.py`).
+- Treat machine-specific paths, usernames, and home-directory locations as sensitive and do not expose them.
