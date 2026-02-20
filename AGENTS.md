@@ -29,6 +29,14 @@ predictable parameter binding.
 - Avoid expanding scope beyond the roadmap
 - Favor small, verifiable steps
 
+## Commit Rules
+- Use conventional commit prefixes: `feat:`, `fix:`, `docs:`, `test:`, `refactor:`, `chore:`.
+- Keep commit subject in imperative mood and around 50-72 characters.
+- One commit should represent one coherent change set.
+- Reference version/tag work explicitly in release commits (for example: `chore: prepare v0.2.0 release`).
+- When suggesting commit messages to users/agents, suggest exactly one concise subject line first.
+- Never suggest amend/rewrite history unless explicitly requested.
+
 ## Invariants (Do Not Break)
 - Deterministic SQL output for identical AST inputs
 - Parameter binding must be safe; never interpolate raw user strings

@@ -130,6 +130,7 @@ ENV/
 
 # Local development
 .development/
+scripts/release.sh
 
 # Project artifacts
 *.db

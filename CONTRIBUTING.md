@@ -37,6 +37,12 @@ ideas. Human review is still expected; AI-generated contributions must be review
 - Tests are required for every change
 - Be cautious about backward compatibility
 
+## Commit Messages
+- Use conventional prefixes where applicable: `feat:`, `fix:`, `docs:`, `test:`, `refactor:`, `chore:`.
+- Keep commit subjects concise (about 50-72 chars), imperative, and focused on one change.
+- Prefer small, reviewable commits over mixed-purpose commits.
+- For release preparation, use explicit subjects (for example: `chore: prepare v0.2.0 release`).
+
 ## Release Workflow
 Install dev tooling:
 ```bash
@@ -49,6 +55,9 @@ poe release
 ```
 
 The `poe release` task executes:
-1. `python -m build --no-isolation`
-2. `python -m twine check dist/*`
-3. `python -m twine upload dist/*`
+1. `python -m unittest`
+2. `python -m build --no-isolation`
+3. `python -m twine check dist/*`
+4. `python -m twine upload dist/*`
+
+Use `poe release-dry-run` to validate tests and artifacts without publishing.

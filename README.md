@@ -136,7 +136,7 @@ Cusco at roughly 5,036 m (16,500 ft). See [Vinicunca](https://en.wikipedia.org/w
 background.
 
 ## Versioning / Roadmap
-Current version: `0.2.0`.
+Current version: `0.2.1`.
 Design notes and current limitations are tracked in `NOTES.md`. Roadmap planning is intentionally
 minimal at this stage and will evolve with real usage.
 
@@ -183,6 +183,12 @@ poe release
 ```
 
 This runs, in order:
+- `python -m unittest`
 - `python -m build --no-isolation`
 - `python -m twine check dist/*`
 - `python -m twine upload dist/*`
+
+For a non-publishing verification pass:
+```bash
+poe release-dry-run
+```
