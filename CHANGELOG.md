@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.2
+### Added
+- Added compile determinism stress tests covering repeated compilation of complex queries.
+
+### Changed
+- Aligned project metadata/docs to `0.2.2`.
+
 ## 0.2.1
 ### Changed
 - Updated release automation to run tests before build/upload.

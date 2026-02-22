@@ -1,0 +1,106 @@
+:root {
+  --md-primary-fg-color: #0a0a0a;
+  --md-primary-fg-color--light: #1a1a1a;
+  --md-primary-fg-color--dark: #000000;
+  --md-accent-fg-color: #111111;
+  --md-typeset-font-size: 0.95rem;
+  --md-text-font: "Open Sans";
+  --md-code-font: "JetBrains Mono";
+  --ss-link-color: #5f6368;
+  --ss-link-hover-color: #43474c;
+  --ss-link-visited-color: #6c7075;
+  --md-typeset-a-color: var(--ss-link-color);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #0b0b0b;
+  --md-default-fg-color: #ededed;
+  --md-default-fg-color--light: #c2c2c2;
+  --md-default-fg-color--lighter: #9a9a9a;
+  --md-code-bg-color: #111111;
+  --md-code-fg-color: #f0f0f0;
+  --md-accent-fg-color: #f2f2f2;
+  --ss-link-color: #b8bcc2;
+  --ss-link-hover-color: #d0d4da;
+  --ss-link-visited-color: #c1c5cb;
+  --md-typeset-a-color: var(--ss-link-color);
+}
+
+.md-typeset {
+  line-height: 1.78;
+  letter-spacing: 0.004em;
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4,
+.md-typeset h5,
+.md-typeset h6 {
+  font-family: "Comfortaa", var(--md-text-font);
+  letter-spacing: 0;
+  font-weight: 700;
+}
+
+.md-typeset p,
+.md-typeset li {
+  max-width: 74ch;
+}
+
+.md-header__title {
+  font-family: "Comfortaa", var(--md-text-font);
+  font-weight: 700;
+}
+
+.md-nav__link,
+.md-tabs__link,
+.md-footer-meta,
+.md-search-result__title {
+  font-family: var(--md-text-font);
+}
+
+.md-typeset a {
+  color: var(--ss-link-color);
+  text-decoration-color: color-mix(in srgb, var(--ss-link-color) 70%, transparent);
+  text-decoration-thickness: 0.08em;
+}
+
+.md-typeset a:visited {
+  color: var(--ss-link-visited-color);
+}
+
+.md-typeset a:hover,
+.md-typeset a:focus {
+  color: var(--ss-link-hover-color);
+  text-decoration-color: currentColor;
+}
+
+.md-nav__link,
+.md-nav__link:visited,
+.md-footer-meta a,
+.md-footer-meta a:visited,
+.md-header__source a,
+.md-header__source a:visited {
+  color: var(--ss-link-color);
+}
+
+.md-nav__link:hover,
+.md-footer-meta a:hover,
+.md-header__source a:hover {
+  color: var(--ss-link-hover-color);
+}
+
+.md-nav--secondary .md-nav__link,
+.md-nav--secondary .md-nav__link:visited,
+.md-nav--secondary .md-nav__link--active,
+.md-nav--secondary .md-nav__link--active:visited,
+.md-nav--secondary .md-nav__item .md-nav__link--active,
+.md-nav--secondary .md-nav__item .md-nav__link--active code {
+  color: var(--ss-link-color) !important;
+}
+
+.md-nav--secondary .md-nav__link:hover,
+.md-nav--secondary .md-nav__link:focus,
+.md-nav--secondary .md-nav__link--active:hover {
+  color: var(--ss-link-hover-color) !important;
+}

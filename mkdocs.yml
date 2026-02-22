@@ -2,6 +2,23 @@ site_name: SQLStratum
 repo_url: https://github.com/aognio/sqlstratum
 theme:
   name: material
+  custom_dir: docs/overrides
+  palette:
+    - scheme: default
+      primary: black
+      accent: black
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      primary: black
+      accent: black
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  font: false
+  features:
+    - content.code.copy
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
@@ -9,3 +26,13 @@ nav:
   - Hydration: hydration.md
   - Roadmap: roadmap.md
   - Changelog: changelog.md
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+      pygments_style: friendly
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+extra_css:
+  - stylesheets/extra.css

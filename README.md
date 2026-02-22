@@ -136,9 +136,9 @@ Cusco at roughly 5,036 m (16,500 ft). See [Vinicunca](https://en.wikipedia.org/w
 background.
 
 ## Versioning / Roadmap
-Current version: `0.2.1`.
-Design notes and current limitations are tracked in `NOTES.md`. Roadmap planning is intentionally
-minimal at this stage and will evolve with real usage.
+Current version: `0.2.2`.
+Design notes and current limitations are tracked in `NOTES.md`. Planned release milestones,
+including PostgreSQL and MySQL MVP start points, are documented in `docs/roadmap.md`.
 
 ## Authorship
 [Antonio Ognio](https://github.com/aognio/) is the maintainer and author of SQLStratum. ChatGPT is used for brainstorming,
