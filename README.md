@@ -14,6 +14,8 @@ layer with composable SQL, predictable parameter binding, and explicit execution
 - Safe parameter binding (no raw interpolation)
 - Hydration targets for structured results
 - SQLite-first execution via a small Runner API
+- Dialect-aware compilation entrypoint (`compile(..., dialect="sqlite" | "mysql")`)
+- Optional MySQL runners for sync (`PyMySQL`) and async (`asyncmy`) execution
 - Testable compiled output and runtime behavior
 
 ## Non-Goals
@@ -65,8 +67,66 @@ names in joins.
 ## Project Structure
 - AST: immutable query nodes in `sqlstratum/ast.py`
 - Compiler: SQL + params generation in `sqlstratum/compile.py`
+- Dialects: compiler adapters and registry in `sqlstratum/dialects/`
 - Runner: SQLite execution and transactions in `sqlstratum/runner.py`
 - Hydration: projection rules and targets in `sqlstratum/hydrate/`
+
+## Dialect Compilation
+`compile(query, dialect=...)` now dispatches through a dialect registry.
+
+Supported built-ins:
+- `sqlite`: full support used by `Runner`
+- `mysql`: compile-only MVP (no MySQL runner yet)
+
+Example:
+```python
+compiled = compile(
+    SELECT(users.c.id, users.c.email).FROM(users).WHERE(users.c.id == 1),
+    dialect="mysql",
+)
+print(compiled.sql)
+# SELECT `users`.`id`, `users`.`email` FROM `users` WHERE `users`.`id` = %(p0)s
+```
+
+## MySQL Runners (Optional)
+Install one or both connectors:
+```bash
+pip install sqlstratum[pymysql]
+pip install sqlstratum[asyncmy]
+# or both
+pip install sqlstratum[mysql]
+```
+
+Synchronous runner (`PyMySQL`):
+```python
+from sqlstratum import MySQLRunner
+
+runner = MySQLRunner.connect(
+    host="127.0.0.1",
+    port=3306,
+    user="app",
+    password="secret",
+    database="appdb",
+)
+rows = runner.fetch_all(SELECT(users.c.id, users.c.email).FROM(users))
+```
+
+Asynchronous runner (`asyncmy`):
+```python
+from sqlstratum import AsyncMySQLRunner
+
+runner = await AsyncMySQLRunner.connect(
+    host="127.0.0.1",
+    port=3306,
+    user="app",
+    password="secret",
+    database="appdb",
+)
+rows = await runner.fetch_all(SELECT(users.c.id, users.c.email).FROM(users))
+```
+
+Both runners execute through the same SQL AST + compiler pipeline. Compilation remains deterministic;
+execution and hydration stay at the runner boundary.
 
 ## SQL Debugging
 SQLStratum can log executed SQL statements (compiled SQL + parameters + duration), but logging is
@@ -136,7 +196,7 @@ Cusco at roughly 5,036 m (16,500 ft). See [Vinicunca](https://en.wikipedia.org/w
 background.
 
 ## Versioning / Roadmap
-Current version: `0.2.2`.
+Current version: `0.3.0`.
 Design notes and current limitations are tracked in `NOTES.md`. Planned release milestones,
 including PostgreSQL and MySQL MVP start points, are documented in `docs/roadmap.md`.
 

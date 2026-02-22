@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sqlstratum"
-version = "0.2.2"
+version = "0.3.0"
 description = "Lightweight, source-first SQL AST + compiler + runner."
 readme = { file = "README.md", content-type = "text/markdown" }
 license = { file = "LICENSE" }
@@ -42,6 +42,16 @@ dev = [
 ]
 pydantic = [
   "pydantic>=2",
+]
+pymysql = [
+  "PyMySQL>=1.1",
+]
+asyncmy = [
+  "asyncmy>=0.2",
+]
+mysql = [
+  "PyMySQL>=1.1",
+  "asyncmy>=0.2",
 ]
 
 [tool.setuptools.packages.find]

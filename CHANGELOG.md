@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.0 - 2026-02-22
+### Added
+- Added a dialect registry (`sqlstratum/dialects/`) and compiler dispatch in `compile(...)`.
+- Added built-in MySQL compiler adapter (compile-only MVP) with deterministic named parameters.
+- Added structured dialect errors via `UnsupportedDialectFeatureError`.
+- Added optional MySQL runners:
+  - `MySQLRunner` (sync, `PyMySQL`)
+  - `AsyncMySQLRunner` (async, `asyncmy`)
+- Added optional dependency groups: `pymysql`, `asyncmy`, and `mysql`.
+
+### Changed
+- Moved SQLite compiler implementation under `sqlstratum/dialects/sqlite/`.
+- Exposed `list_dialects()` in the top-level API.
+
 ## 0.2.2
 ### Added
 - Added compile determinism stress tests covering repeated compilation of complex queries.

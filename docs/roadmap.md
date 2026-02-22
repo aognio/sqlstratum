@@ -11,9 +11,9 @@ practical and incremental, with explicit layering preserved (AST/compile, runner
 - Improve docs for deprecation policy and migration paths.
 
 ### 0.3.0 (Feature)
-- Complete and stabilize sqlite aggregate support in dialect namespace.
-- Improve sqlite dialect boundary and capability checks.
-- Expand integration tests for dialect-specific features.
+- Introduce dialect registry and built-in compiler adapters (`sqlite`, `mysql` compile-only MVP).
+- Add optional MySQL runners (`PyMySQL` sync and `asyncmy` async) with connector-specific extras.
+- Expand compile snapshot coverage for multi-dialect determinism.
 
 ### 0.3.1 (Patch)
 - Tighten error messaging for unsupported dialect features.
@@ -30,9 +30,9 @@ practical and incremental, with explicit layering preserved (AST/compile, runner
 - Add PostgreSQL compile snapshots and compatibility fixes.
 - Improve docs and migration guidance for early adopters.
 
-### 0.5.0 (Feature, MySQL MVP Start)
-- Introduce MySQL dialect compiler MVP for core query paths.
-- Add MySQL-focused compile/integration coverage.
+### 0.5.0 (Feature, MySQL Runtime Start)
+- Add a MySQL runner boundary once connection/transaction semantics are validated.
+- Extend MySQL coverage from compile-only to execution integration tests.
 - Continue keeping dialect-specific behavior out of core abstractions.
 
 ## Longer-Term
