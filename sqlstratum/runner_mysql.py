@@ -6,10 +6,11 @@ import logging
 import os
 import time
 from contextlib import contextmanager
-from typing import Any, Dict, Iterable, Mapping, Optional, Sequence
+from typing import Any, Dict, Mapping, Optional, Sequence
 
 from . import ast
 from .compile import compile
+from .connection_url import parse_mysql_url
 from .hydrate import hydrate_rows
 
 
@@ -95,27 +96,36 @@ class MySQLRunner:
     def connect(
         cls,
         *,
-        host: str,
-        user: str,
-        password: str,
-        database: str,
-        port: int = 3306,
+        url: Optional[str] = None,
+        host: Optional[str] = None,
+        user: Optional[str] = None,
+        password: Optional[str] = None,
+        database: Optional[str] = None,
+        port: Optional[int] = None,
         **kwargs: Any,
     ) -> "MySQLRunner":
+        if url and any(v is not None for v in (host, user, password, database, port)):
+            raise ValueError("Provide either 'url' or individual connection parameters, not both")
+        if not url and any(v is None for v in (host, user, password, database)):
+            raise ValueError("Missing required connection parameters: host, user, password, database")
+        if url:
+            conn_args = parse_mysql_url(url, async_mode=False)
+        else:
+            conn_args = {
+                "host": host,
+                "user": user,
+                "password": password,
+                "database": database,
+                "port": 3306 if port is None else port,
+            }
+
         try:
             pymysql = _import_pymysql()
         except Exception as exc:
             raise RuntimeError(_INSTALL_MESSAGE) from exc
 
         kwargs.setdefault("autocommit", False)
-        connection = pymysql.connect(
-            host=host,
-            user=user,
-            password=password,
-            database=database,
-            port=port,
-            **kwargs,
-        )
+        connection = pymysql.connect(**conn_args, **kwargs)
         return cls(connection)
 
     def exec_ddl(self, sql: str) -> None:

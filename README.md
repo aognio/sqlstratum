@@ -4,8 +4,8 @@
   <img src="https://raw.githubusercontent.com/aognio/sqlstratum/main/assets/images/SQLStratum-Logo-500x500-transparent.png" alt="SQLStratum logo" />
 </p>
 
-SQLStratum is a modern, typed, deterministic SQL query builder and compiler for Python with a 
-SQLite runner and a hydration pipeline. It exists to give applications and ORMs a reliable foundation 
+SQLStratum is a modern, typed, deterministic SQL query builder and compiler for Python with execution
+runners and a hydration pipeline. It exists to give applications and ORMs a reliable foundation
 layer with composable SQL, predictable parameter binding, and explicit execution boundaries.
 
 ## Key Features
@@ -13,7 +13,7 @@ layer with composable SQL, predictable parameter binding, and explicit execution
 - Typed, composable DSL for SELECT/INSERT/UPDATE/DELETE
 - Safe parameter binding (no raw interpolation)
 - Hydration targets for structured results
-- SQLite-first execution via a small Runner API
+- SQLite execution via `Runner` plus optional MySQL sync/async runners
 - Dialect-aware compilation entrypoint (`compile(..., dialect="sqlite" | "mysql")`)
 - Optional MySQL runners for sync (`PyMySQL`) and async (`asyncmy`) execution
 - Testable compiled output and runtime behavior
@@ -21,7 +21,7 @@ layer with composable SQL, predictable parameter binding, and explicit execution
 ## Non-Goals
 - Not an ORM (no identity map, relationships, lazy loading)
 - Not a migrations/DDL system
-- Not a full database abstraction layer for every backend yet (SQLite first)
+- Not a full database abstraction layer for every backend yet (SQLite is most mature; MySQL is early support)
 - Not a SQL string templating engine
 
 SQLStratum focuses on queries. DDL statements such as `CREATE TABLE` or `ALTER TABLE` are intended to
@@ -31,7 +31,7 @@ live in a complementary library with similar design goals that is currently in t
 ```python
 import sqlite3
 
-from sqlstratum import SELECT, INSERT, Table, col, Runner
+from sqlstratum import SELECT, INSERT, Table, col, SQLiteRunner
 
 users = Table(
     "users",
@@ -41,7 +41,7 @@ users = Table(
 )
 
 conn = sqlite3.connect(":memory:")
-runner = Runner(conn)
+runner = SQLiteRunner(conn)
 runner.exec_ddl("CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT, active INTEGER)")
 
 runner.execute(INSERT(users).VALUES(email="a@b.com", active=1))
@@ -68,15 +68,15 @@ names in joins.
 - AST: immutable query nodes in `sqlstratum/ast.py`
 - Compiler: SQL + params generation in `sqlstratum/compile.py`
 - Dialects: compiler adapters and registry in `sqlstratum/dialects/`
-- Runner: SQLite execution and transactions in `sqlstratum/runner.py`
+- Runners: SQLite in `sqlstratum/runner.py`, MySQL sync in `sqlstratum/runner_mysql.py`, MySQL async in `sqlstratum/runner_mysql_async.py`
 - Hydration: projection rules and targets in `sqlstratum/hydrate/`
 
 ## Dialect Compilation
 `compile(query, dialect=...)` now dispatches through a dialect registry.
 
 Supported built-ins:
-- `sqlite`: full support used by `Runner`
-- `mysql`: compile-only MVP (no MySQL runner yet)
+- `sqlite`: full support used by `SQLiteRunner` (with `Runner` compatibility alias)
+- `mysql`: compiler support plus optional runtime runners (`MySQLRunner`, `AsyncMySQLRunner`)
 
 Example:
 ```python
@@ -111,6 +111,11 @@ runner = MySQLRunner.connect(
 rows = runner.fetch_all(SELECT(users.c.id, users.c.email).FROM(users))
 ```
 
+Or with URL:
+```python
+runner = MySQLRunner.connect(url="mysql+pymysql://app:secret@127.0.0.1:3306/appdb")
+```
+
 Asynchronous runner (`asyncmy`):
 ```python
 from sqlstratum import AsyncMySQLRunner
@@ -124,6 +129,37 @@ runner = await AsyncMySQLRunner.connect(
 )
 rows = await runner.fetch_all(SELECT(users.c.id, users.c.email).FROM(users))
 ```
+
+Or with URL:
+```python
+runner = await AsyncMySQLRunner.connect(url="mysql+asyncmy://app:secret@127.0.0.1:3306/appdb")
+```
+
+SQLite URL form:
+```python
+from sqlstratum import SQLiteRunner
+
+runner = SQLiteRunner.connect(url="sqlite:///app.db")
+# or in-memory
+runner = SQLiteRunner.connect(url="sqlite:///:memory:")
+```
+
+Connection config rule: provide either a URL or individual connection parameters, never both in one call.
+Currently supported URL forms:
+- SQLite: `sqlite:///relative/path.db`, `sqlite:////absolute/path.db`, `sqlite:///:memory:`
+- MySQL sync: `mysql://user:pass@host:3306/db` or `mysql+pymysql://...`
+- MySQL async: `mysql://user:pass@host:3306/db` or `mysql+asyncmy://...`
+
+URL query parameters/fragments are intentionally rejected for now to keep connection parsing explicit and deterministic.
+
+| URL | Sync MySQLRunner | Async AsyncMySQLRunner | SQLiteRunner |
+|---|---|---|---|
+| `sqlite:///:memory:` | No | No | Yes |
+| `sqlite:///data/app.db` | No | No | Yes |
+| `sqlite:////var/lib/app.db` | No | No | Yes |
+| `mysql://user:pass@127.0.0.1:3306/cities_db` | Yes | Yes | No |
+| `mysql+pymysql://user:pass@127.0.0.1:3306/cities_db` | Yes | No | No |
+| `mysql+asyncmy://user:pass@127.0.0.1:3306/cities_db` | No | Yes | No |
 
 Both runners execute through the same SQL AST + compiler pipeline. Compilation remains deterministic;
 execution and hydration stay at the runner boundary.
@@ -196,9 +232,9 @@ Cusco at roughly 5,036 m (16,500 ft). See [Vinicunca](https://en.wikipedia.org/w
 background.
 
 ## Versioning / Roadmap
-Current version: `0.3.0`.
+Current version: `0.3.1`.
 Design notes and current limitations are tracked in `NOTES.md`. Planned release milestones,
-including PostgreSQL and MySQL MVP start points, are documented in `docs/roadmap.md`.
+including PostgreSQL and cross-dialect parity work, are documented in `docs/roadmap.md`.
 
 ## Authorship
 [Antonio Ognio](https://github.com/aognio/) is the maintainer and author of SQLStratum. ChatGPT is used for brainstorming,

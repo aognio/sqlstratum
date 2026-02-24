@@ -6,10 +6,11 @@ import os
 import sqlite3
 import time
 from contextlib import contextmanager
-from typing import Any, Dict, Iterable, Optional
+from typing import Any, Dict, Optional
 
 from . import ast
 from .compile import compile
+from .connection_url import parse_sqlite_url
 from .hydrate import hydrate_rows
 
 
@@ -62,15 +63,20 @@ def _debug_log(compiled: ast.Compiled, duration_ms: float) -> None:
     )
 
 
-class Runner:
+class SQLiteRunner:
     def __init__(self, connection: sqlite3.Connection):
         self.connection = connection
         self.connection.row_factory = sqlite3.Row
         self._tx_depth = 0
 
     @classmethod
-    def connect(cls, path: str) -> "Runner":
-        return cls(sqlite3.connect(path))
+    def connect(cls, path: Optional[str] = None, *, url: Optional[str] = None) -> "SQLiteRunner":
+        if path and url:
+            raise ValueError("Provide either 'path' or 'url', not both")
+        if not path and not url:
+            raise ValueError("Provide one connection target: either 'path' or 'url'")
+        db_path = parse_sqlite_url(url) if url else path
+        return cls(sqlite3.connect(db_path))
 
     def exec_ddl(self, sql: str) -> None:
         cur = self.connection.cursor()
@@ -139,3 +145,6 @@ class Runner:
             self.connection.commit()
         finally:
             self._tx_depth -= 1
+
+
+Runner = SQLiteRunner

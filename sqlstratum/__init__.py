@@ -5,7 +5,7 @@ from .meta import Table, Column, col
 from .compile import compile
 from .dialects import list_dialects
 from .errors import SQLStratumError, UnsupportedDialectFeatureError
-from .runner import Runner
+from .runner import Runner, SQLiteRunner
 from .runner_mysql import MySQLRunner
 from .runner_mysql_async import AsyncMySQLRunner
 from .types import Expression, HydrationTarget, Hydrator, Predicate, Source
@@ -28,6 +28,7 @@ __all__ = [
     "col",
     "compile",
     "list_dialects",
+    "SQLiteRunner",
     "Runner",
     "MySQLRunner",
     "AsyncMySQLRunner",

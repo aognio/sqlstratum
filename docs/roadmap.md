@@ -1,7 +1,7 @@
 # Roadmap
 
-SQLStratum is in early development and currently targets SQLite. The roadmap below is intended to be
-practical and incremental, with explicit layering preserved (AST/compile, runner, hydration).
+SQLStratum is in early development. SQLite is the most mature backend and MySQL has initial runtime
+support. The roadmap below is incremental, with explicit layering preserved (AST/compile, runner, hydration).
 
 ## Near-Term Releases
 
@@ -10,14 +10,15 @@ practical and incremental, with explicit layering preserved (AST/compile, runner
 - Increase deterministic compile test coverage for complex queries.
 - Improve docs for deprecation policy and migration paths.
 
-### 0.3.0 (Feature)
-- Introduce dialect registry and built-in compiler adapters (`sqlite`, `mysql` compile-only MVP).
-- Add optional MySQL runners (`PyMySQL` sync and `asyncmy` async) with connector-specific extras.
-- Expand compile snapshot coverage for multi-dialect determinism.
+### 0.3.0 (Shipped)
+- Added dialect registry and built-in compiler adapters (`sqlite`, `mysql`).
+- Added optional MySQL runners (`PyMySQL` sync and `asyncmy` async) with connector-specific extras.
+- Expanded compile/test coverage for multi-dialect determinism.
 
-### 0.3.1 (Patch)
-- Tighten error messaging for unsupported dialect features.
-- Add more guardrails around public API and deprecation warnings.
+### 0.3.1 (Shipped)
+- Added `SQLiteRunner` canonical naming with `Runner` compatibility alias.
+- Added URL-based connection support for SQLite and MySQL runners.
+- Added strict connection option validation and expanded docs/test coverage.
 
 ## Multi-Dialect Start
 
@@ -30,9 +31,9 @@ practical and incremental, with explicit layering preserved (AST/compile, runner
 - Add PostgreSQL compile snapshots and compatibility fixes.
 - Improve docs and migration guidance for early adopters.
 
-### 0.5.0 (Feature, MySQL Runtime Start)
-- Add a MySQL runner boundary once connection/transaction semantics are validated.
-- Extend MySQL coverage from compile-only to execution integration tests.
+### 0.5.0 (Feature, MySQL Hardening)
+- Expand MySQL execution integration coverage across real server scenarios.
+- Improve connector parity and error semantics across sync/async runners.
 - Continue keeping dialect-specific behavior out of core abstractions.
 
 ## Longer-Term

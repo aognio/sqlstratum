@@ -1,9 +1,23 @@
 # Changelog
 
+## 0.3.1 - 2026-02-24
+### Added
+- Added connection URL parsing helpers for SQLite and MySQL.
+- Added connection URL support for:
+  - `SQLiteRunner.connect(path=...|url=...)`
+  - `MySQLRunner.connect(...)`
+  - `AsyncMySQLRunner.connect(...)`
+- Added validation matrix documentation for accepted/rejected URL forms.
+
+### Changed
+- Added `SQLiteRunner` as the canonical SQLite runner name and kept `Runner` as a compatibility alias.
+- Enforced connection configuration exclusivity: callers must provide either URL or individual parameters, not both.
+- Improved URL validation and error messaging (missing auth/database, invalid scheme/port, unsupported query/fragment).
+
 ## 0.3.0 - 2026-02-22
 ### Added
 - Added a dialect registry (`sqlstratum/dialects/`) and compiler dispatch in `compile(...)`.
-- Added built-in MySQL compiler adapter (compile-only MVP) with deterministic named parameters.
+- Added built-in MySQL compiler adapter with deterministic named parameters.
 - Added structured dialect errors via `UnsupportedDialectFeatureError`.
 - Added optional MySQL runners:
   - `MySQLRunner` (sync, `PyMySQL`)
