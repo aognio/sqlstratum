@@ -1,6 +1,6 @@
 import unittest
 
-from sqlstratum import DELETE, INSERT, SELECT, UPDATE, Table, col, compile
+from sqlstratum import DELETE, INSERT, SELECT, UPDATE, TOTAL, GROUP_CONCAT, Table, col, compile
 from sqlstratum.errors import UnsupportedDialectFeatureError
 
 
@@ -64,6 +64,17 @@ class TestCompileMySQL(unittest.TestCase):
         self.assertIn("dialect", msg)
         self.assertIn("mysql", msg)
         self.assertIn("sqlite", msg)
+
+    def test_sqlite_only_aggregates_raise(self):
+        q1 = SELECT(TOTAL(users.c.id).AS("n")).FROM(users)
+        with self.assertRaises(UnsupportedDialectFeatureError) as cm1:
+            compile(q1, dialect="mysql")
+        self.assertIn("TOTAL aggregate", str(cm1.exception))
+
+        q2 = SELECT(GROUP_CONCAT(users.c.email).AS("emails")).FROM(users)
+        with self.assertRaises(UnsupportedDialectFeatureError) as cm2:
+            compile(q2, dialect="mysql")
+        self.assertIn("GROUP_CONCAT aggregate", str(cm2.exception))
 
 
 if __name__ == "__main__":

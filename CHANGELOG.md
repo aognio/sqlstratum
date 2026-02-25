@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.3.2 - 2026-02-25
+### Added
+- Added explicit dialect wrappers:
+  - `using_sqlite(...)` in `sqlstratum.sqlite`
+  - `using_mysql(...)` in `sqlstratum.mysql`
+- Added dialect binding utilities to preserve wrapper intent through compile and runner boundaries.
+- Added SQLite extension helpers in explicit namespace:
+  - `TOTAL(...)`
+  - `GROUP_CONCAT(...)`
+- Added a dedicated docs page for wrapper behavior and guardrails (`docs/dialect-wrappers.md`).
+
+### Changed
+- Made wrapped queries chain-friendly (query methods continue to work after wrapping).
+- Added clear errors for conflicting nested wrapper bindings.
+- Hardened MySQL compiler guardrails for SQLite-only aggregates.
+- Expanded interaction test coverage across wrappers, compile, runners, and hydration.
+
 ## 0.3.1 - 2026-02-24
 ### Added
 - Added connection URL parsing helpers for SQLite and MySQL.

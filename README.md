@@ -88,6 +88,22 @@ print(compiled.sql)
 # SELECT `users`.`id`, `users`.`email` FROM `users` WHERE `users`.`id` = %(p0)s
 ```
 
+For SQLite-specific features, use the explicit wrapper:
+```python
+from sqlstratum.sqlite import using_sqlite, TOTAL
+
+q = using_sqlite(SELECT(TOTAL(users.c.id).AS("n")).FROM(users))
+compiled = compile(q)  # sqlite dialect intent is bound by wrapper
+```
+
+For MySQL intent, use the matching wrapper:
+```python
+from sqlstratum.mysql import using_mysql
+
+q = using_mysql(SELECT(users.c.id, users.c.email).FROM(users))
+compiled = compile(q, dialect="mysql")
+```
+
 ## MySQL Runners (Optional)
 Install one or both connectors:
 ```bash
@@ -232,7 +248,7 @@ Cusco at roughly 5,036 m (16,500 ft). See [Vinicunca](https://en.wikipedia.org/w
 background.
 
 ## Versioning / Roadmap
-Current version: `0.3.1`.
+Current version: `0.3.2`.
 Design notes and current limitations are tracked in `NOTES.md`. Planned release milestones,
 including PostgreSQL and cross-dialect parity work, are documented in `docs/roadmap.md`.
 

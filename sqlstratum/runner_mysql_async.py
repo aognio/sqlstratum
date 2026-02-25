@@ -11,6 +11,7 @@ from typing import Any, Dict, Mapping, Optional, Sequence
 from . import ast
 from .compile import compile
 from .connection_url import parse_mysql_url
+from .dialect_binding import unwrap_query
 from .hydrate import hydrate_rows
 
 
@@ -134,8 +135,9 @@ class AsyncMySQLRunner:
         if self._tx_depth == 0:
             await self.connection.commit()
 
-    async def fetch_all(self, query: ast.SelectQuery) -> list[Any]:
-        compiled = compile(query, dialect="mysql")
+    async def fetch_all(self, query: Any) -> list[Any]:
+        unwrapped_query, _ = unwrap_query(query, "mysql")
+        compiled = compile(unwrapped_query, dialect="mysql")
         log_enabled = _debug_enabled()
         start = time.perf_counter() if log_enabled else 0.0
         async with self.connection.cursor() as cur:
@@ -143,10 +145,11 @@ class AsyncMySQLRunner:
             rows = _normalize_rows(cur, await cur.fetchall())
         if log_enabled:
             _debug_log(compiled, (time.perf_counter() - start) * 1000)
-        return hydrate_rows(rows, query.projections, query.hydration or dict)
+        return hydrate_rows(rows, unwrapped_query.projections, unwrapped_query.hydration or dict)
 
-    async def fetch_one(self, query: ast.SelectQuery) -> Optional[Any]:
-        compiled = compile(query, dialect="mysql")
+    async def fetch_one(self, query: Any) -> Optional[Any]:
+        unwrapped_query, _ = unwrap_query(query, "mysql")
+        compiled = compile(unwrapped_query, dialect="mysql")
         log_enabled = _debug_enabled()
         start = time.perf_counter() if log_enabled else 0.0
         async with self.connection.cursor() as cur:
@@ -156,10 +159,11 @@ class AsyncMySQLRunner:
             _debug_log(compiled, (time.perf_counter() - start) * 1000)
         if row is None:
             return None
-        return hydrate_rows([row], query.projections, query.hydration or dict)[0]
+        return hydrate_rows([row], unwrapped_query.projections, unwrapped_query.hydration or dict)[0]
 
-    async def scalar(self, query: ast.SelectQuery) -> Optional[Any]:
-        compiled = compile(query, dialect="mysql")
+    async def scalar(self, query: Any) -> Optional[Any]:
+        unwrapped_query, _ = unwrap_query(query, "mysql")
+        compiled = compile(unwrapped_query, dialect="mysql")
         log_enabled = _debug_enabled()
         start = time.perf_counter() if log_enabled else 0.0
         async with self.connection.cursor() as cur:
@@ -174,7 +178,8 @@ class AsyncMySQLRunner:
         return row[0]
 
     async def execute(self, query: Any) -> ast.ExecutionResult:
-        compiled = compile(query, dialect="mysql")
+        unwrapped_query, _ = unwrap_query(query, "mysql")
+        compiled = compile(unwrapped_query, dialect="mysql")
         log_enabled = _debug_enabled()
         start = time.perf_counter() if log_enabled else 0.0
         async with self.connection.cursor() as cur:

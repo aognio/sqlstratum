@@ -19,6 +19,8 @@ from ...expr import (
 from ...meta import Column, Table
 from ...types import Predicate
 
+_SQLITE_ONLY_FUNCTIONS = {"TOTAL", "GROUP_CONCAT"}
+
 
 @dataclass(frozen=True)
 class Compiled(ast.Compiled):
@@ -118,6 +120,12 @@ class _Compiler:
         if isinstance(expr, AliasExpr):
             return f"{self._compile_expr(expr.expr)} AS {self._quote(expr.alias)}"
         if isinstance(expr, Function):
+            if expr.name.upper() in _SQLITE_ONLY_FUNCTIONS:
+                raise UnsupportedDialectFeatureError(
+                    "mysql",
+                    f"{expr.name.upper()} aggregate",
+                    hint="Use a portable aggregate or compile with dialect='sqlite'.",
+                )
             args = ", ".join(self._compile_expr(a) for a in expr.args)
             return f"{expr.name}({args})"
         if isinstance(expr, OrderSpec):

@@ -20,6 +20,11 @@ support. The roadmap below is incremental, with explicit layering preserved (AST
 - Added URL-based connection support for SQLite and MySQL runners.
 - Added strict connection option validation and expanded docs/test coverage.
 
+### 0.3.2 (Shipped)
+- Added explicit dialect wrappers (`using_sqlite`, `using_mysql`).
+- Added dialect-binding guardrails and chain-friendly wrapper behavior.
+- Expanded interaction test coverage for wrappers with compile, runners, and hydration.
+
 ## Multi-Dialect Start
 
 ### 0.4.0 (Feature, PostgreSQL MVP Start)

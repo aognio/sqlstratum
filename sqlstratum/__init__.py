@@ -8,6 +8,8 @@ from .errors import SQLStratumError, UnsupportedDialectFeatureError
 from .runner import Runner, SQLiteRunner
 from .runner_mysql import MySQLRunner
 from .runner_mysql_async import AsyncMySQLRunner
+from .mysql import using_mysql
+from .sqlite import using_sqlite, TOTAL, GROUP_CONCAT
 from .types import Expression, HydrationTarget, Hydrator, Predicate, Source
 
 __all__ = [
@@ -23,6 +25,10 @@ __all__ = [
     "AVG",
     "MIN",
     "MAX",
+    "using_mysql",
+    "using_sqlite",
+    "TOTAL",
+    "GROUP_CONCAT",
     "Table",
     "Column",
     "col",

@@ -112,4 +112,14 @@ def MAX(expr: Expr) -> Function:
     return Function("MAX", (ensure_expr(expr),))
 
 
+def TOTAL(expr: Expr) -> Function:
+    return Function("TOTAL", (ensure_expr(expr),))
+
+
+def GROUP_CONCAT(expr: Expr, separator: Optional[str] = None) -> Function:
+    if separator is None:
+        return Function("GROUP_CONCAT", (ensure_expr(expr),))
+    return Function("GROUP_CONCAT", (ensure_expr(expr), Literal(separator)))
+
+
 Predicate = BinaryPredicate | UnaryPredicate | LogicalPredicate | NotPredicate

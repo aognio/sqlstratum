@@ -22,6 +22,7 @@ theme:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
+  - Dialect Wrappers: dialect-wrappers.md
   - Debugging: debugging.md
   - Hydration: hydration.md
   - Roadmap: roadmap.md

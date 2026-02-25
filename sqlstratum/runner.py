@@ -11,6 +11,7 @@ from typing import Any, Dict, Optional
 from . import ast
 from .compile import compile
 from .connection_url import parse_sqlite_url
+from .dialect_binding import unwrap_query
 from .hydrate import hydrate_rows
 
 
@@ -84,8 +85,9 @@ class SQLiteRunner:
         if self._tx_depth == 0:
             self.connection.commit()
 
-    def fetch_all(self, query: ast.SelectQuery) -> list[Any]:
-        compiled = compile(query)
+    def fetch_all(self, query: Any) -> list[Any]:
+        unwrapped_query, _ = unwrap_query(query, "sqlite")
+        compiled = compile(unwrapped_query, dialect="sqlite")
         log_enabled = _debug_enabled()
         start = time.perf_counter() if log_enabled else 0.0
         cur = self.connection.cursor()
@@ -93,10 +95,11 @@ class SQLiteRunner:
         rows = cur.fetchall()
         if log_enabled:
             _debug_log(compiled, (time.perf_counter() - start) * 1000)
-        return hydrate_rows(rows, query.projections, query.hydration or dict)
+        return hydrate_rows(rows, unwrapped_query.projections, unwrapped_query.hydration or dict)
 
-    def fetch_one(self, query: ast.SelectQuery) -> Optional[Any]:
-        compiled = compile(query)
+    def fetch_one(self, query: Any) -> Optional[Any]:
+        unwrapped_query, _ = unwrap_query(query, "sqlite")
+        compiled = compile(unwrapped_query, dialect="sqlite")
         log_enabled = _debug_enabled()
         start = time.perf_counter() if log_enabled else 0.0
         cur = self.connection.cursor()
@@ -106,10 +109,11 @@ class SQLiteRunner:
             _debug_log(compiled, (time.perf_counter() - start) * 1000)
         if row is None:
             return None
-        return hydrate_rows([row], query.projections, query.hydration or dict)[0]
+        return hydrate_rows([row], unwrapped_query.projections, unwrapped_query.hydration or dict)[0]
 
-    def scalar(self, query: ast.SelectQuery) -> Optional[Any]:
-        compiled = compile(query)
+    def scalar(self, query: Any) -> Optional[Any]:
+        unwrapped_query, _ = unwrap_query(query, "sqlite")
+        compiled = compile(unwrapped_query, dialect="sqlite")
         log_enabled = _debug_enabled()
         start = time.perf_counter() if log_enabled else 0.0
         cur = self.connection.cursor()
@@ -122,7 +126,8 @@ class SQLiteRunner:
         return row[0]
 
     def execute(self, query: Any) -> ast.ExecutionResult:
-        compiled = compile(query)
+        unwrapped_query, _ = unwrap_query(query, "sqlite")
+        compiled = compile(unwrapped_query, dialect="sqlite")
         log_enabled = _debug_enabled()
         start = time.perf_counter() if log_enabled else 0.0
         cur = self.connection.cursor()

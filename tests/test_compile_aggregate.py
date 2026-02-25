@@ -1,6 +1,6 @@
 import unittest
 
-from sqlstratum import SELECT, COUNT, Table, col, compile
+from sqlstratum import SELECT, COUNT, TOTAL, GROUP_CONCAT, Table, col, compile
 
 
 users = Table(
@@ -50,6 +50,33 @@ class TestCompileAggregate(unittest.TestCase):
             'GROUP BY "orgs"."id", "orgs"."name" HAVING COUNT("users"."id") >= :p0',
         )
         self.assertEqual(compiled.params, {"p0": 10})
+
+    def test_total_aggregate(self):
+        q = SELECT(TOTAL(users.c.id).AS("total_users")).FROM(users)
+        compiled = compile(q, dialect="sqlite")
+        self.assertEqual(
+            compiled.sql,
+            'SELECT TOTAL("users"."id") AS "total_users" FROM "users"',
+        )
+        self.assertEqual(compiled.params, {})
+
+    def test_group_concat_default_separator(self):
+        q = SELECT(GROUP_CONCAT(orgs.c.name).AS("names")).FROM(orgs)
+        compiled = compile(q, dialect="sqlite")
+        self.assertEqual(
+            compiled.sql,
+            'SELECT GROUP_CONCAT("orgs"."name") AS "names" FROM "orgs"',
+        )
+        self.assertEqual(compiled.params, {})
+
+    def test_group_concat_with_separator(self):
+        q = SELECT(GROUP_CONCAT(orgs.c.name, " | ").AS("names")).FROM(orgs)
+        compiled = compile(q, dialect="sqlite")
+        self.assertEqual(
+            compiled.sql,
+            'SELECT GROUP_CONCAT("orgs"."name", :p0) AS "names" FROM "orgs"',
+        )
+        self.assertEqual(compiled.params, {"p0": " | "})
 
 
 if __name__ == "__main__":

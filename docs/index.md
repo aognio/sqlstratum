@@ -14,5 +14,6 @@ layer with composable SQL, predictable parameter binding, and explicit execution
 
 Get started in a few minutes:
 - [Getting started](getting-started.md)
+- [Dialect wrappers](dialect-wrappers.md)
 - [Hydration](hydration.md)
 - [Debugging](debugging.md)

@@ -46,6 +46,24 @@ compiled = compile(
 print(compiled.sql)
 ```
 
+For SQLite-only features, bind intent explicitly:
+```python
+from sqlstratum.sqlite import using_sqlite, TOTAL
+
+q = using_sqlite(SELECT(TOTAL(users.c.id).AS("n")).FROM(users))
+compiled = compile(q)  # sqlite intent
+```
+
+For MySQL intent, bind explicitly as well:
+```python
+from sqlstratum.mysql import using_mysql
+
+q = using_mysql(SELECT(users.c.id, users.c.email).FROM(users))
+compiled = compile(q, dialect="mysql")
+```
+
+See [Dialect wrappers](dialect-wrappers.md) for behavior and guardrails.
+
 ## Optional MySQL Execution
 Install optional connectors as needed:
 
