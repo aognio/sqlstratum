@@ -11,6 +11,8 @@ layer with composable SQL, predictable parameter binding, and explicit execution
 ## Key Features
 - Deterministic compilation: identical AST inputs produce identical SQL + params
 - Typed, composable DSL for SELECT/INSERT/UPDATE/DELETE
+- Portable predicate support for `IN`/`NOT IN`, `BETWEEN`/`NOT BETWEEN`, `EXISTS`/`NOT EXISTS`
+- Set operations: `UNION`, `UNION ALL`, `INTERSECT`, `EXCEPT`
 - Safe parameter binding (no raw interpolation)
 - Hydration targets for structured results
 - SQLite execution via `Runner` plus optional MySQL sync/async runners
@@ -104,6 +106,20 @@ q = using_mysql(SELECT(users.c.id, users.c.email).FROM(users))
 compiled = compile(q, dialect="mysql")
 ```
 
+## Dialect Capability Contract
+The current cross-dialect contract is intentionally explicit:
+
+| Feature | SQLite | MySQL |
+|---|---|---|
+| Portable predicates (`IN`, `BETWEEN`, `EXISTS`) | Yes | Yes |
+| `RIGHT JOIN` | No | Yes |
+| `FULL OUTER JOIN` | No | No |
+| `TOTAL(...)` | Yes | No |
+| `GROUP_CONCAT(...)` | Yes | No |
+| `OFFSET` without `LIMIT` | Yes | No |
+
+These rules are enforced with dedicated contract tests and `UnsupportedDialectFeatureError` guardrails.
+
 ## MySQL Runners (Optional)
 Install one or both connectors:
 ```bash
@@ -179,6 +195,72 @@ URL query parameters/fragments are intentionally rejected for now to keep connec
 
 Both runners execute through the same SQL AST + compiler pipeline. Compilation remains deterministic;
 execution and hydration stay at the runner boundary.
+
+## Ordering API
+Primary ordering style (recommended):
+
+```python
+from sqlstratum import ASC, DESC
+
+q = (
+    SELECT(users.c.id, users.c.email)
+    .FROM(users)
+    .ORDER_BY(
+        DESC(users.c.created_at),
+        ASC(users.c.email),
+        ASC(users.c.id),
+    )
+)
+```
+
+Clause-fluent ordering style is also supported:
+```python
+q = (
+    SELECT(users.c.id, users.c.email)
+    .FROM(users)
+    .ORDER_BY(users.c.created_at)
+    .DESC()
+    .THEN(users.c.email)
+    .ASC()
+)
+```
+
+Mixed style is supported:
+```python
+q = (
+    SELECT(users.c.id, users.c.email)
+    .FROM(users)
+    .ORDER_BY(DESC(users.c.created_at), users.c.email)
+    .ASC()
+    .THEN(DESC(users.c.id))
+)
+```
+
+`ORDER_BY(...)` with a bare expression requires a subsequent `.ASC()` or `.DESC()` before compile/execute.
+
+## Predicate And Set-Op Examples
+```python
+from sqlstratum import EXISTS, NOT_EXISTS
+
+active_orgs = SELECT(orgs.c.id).FROM(orgs).WHERE(orgs.c.active == 1)
+sub = SELECT(orgs.c.id).FROM(orgs).WHERE(orgs.c.id == users.c.org_id)
+
+q = (
+    SELECT(users.c.id, users.c.email)
+    .FROM(users)
+    .WHERE(
+        users.c.org_id.IN(active_orgs),
+        users.c.age.BETWEEN(18, 65),
+        EXISTS(sub),
+        NOT_EXISTS(sub),
+    )
+)
+
+q_all = (
+    SELECT(users.c.id, users.c.email).FROM(users)
+    .UNION_ALL(SELECT(admins.c.id, admins.c.email).FROM(admins))
+)
+```
 
 ## SQL Debugging
 SQLStratum can log executed SQL statements (compiled SQL + parameters + duration), but logging is
@@ -265,6 +347,14 @@ MIT License.
 ## Contributing
 PRs are welcome. Please read `CONTRIBUTING.md` for the workflow and expectations.
 
+Optional real MySQL integration tests are available and disabled by default:
+```bash
+SQLSTRATUM_RUN_MYSQL_INTEGRATION=1 \
+SQLSTRATUM_TEST_MYSQL_URL_SYNC='mysql+pymysql://user:pass@127.0.0.1:3306/db' \
+SQLSTRATUM_TEST_MYSQL_URL_ASYNC='mysql+asyncmy://user:pass@127.0.0.1:3306/db' \
+python -m unittest tests.test_mysql_integration_real
+```
+
 ## Documentation
 Install docs dependencies:
 ```bash
@@ -280,6 +370,8 @@ Build the static site:
 ```bash
 mkdocs build --clean
 ```
+
+Testing guidance is documented in `docs/testing.md`, including opt-in real MySQL integration tests.
 
 Read the Docs will build documentation automatically once the repository is imported.
 

@@ -64,6 +64,67 @@ compiled = compile(q, dialect="mysql")
 
 See [Dialect wrappers](dialect-wrappers.md) for behavior and guardrails.
 
+## Ordering
+Primary style:
+
+```python
+from sqlstratum import ASC, DESC
+
+q = (
+    SELECT(users.c.id, users.c.email)
+    .FROM(users)
+    .ORDER_BY(
+        DESC(users.c.created_at),
+        ASC(users.c.email),
+        ASC(users.c.id),
+    )
+)
+```
+
+Alternative fluent style:
+```python
+q = (
+    SELECT(users.c.id, users.c.email)
+    .FROM(users)
+    .ORDER_BY(users.c.id)
+    .ASC()
+    .THEN(users.c.email)
+    .DESC()
+)
+```
+
+Mixed style is supported too:
+```python
+q = (
+    SELECT(users.c.id, users.c.email)
+    .FROM(users)
+    .ORDER_BY(DESC(users.c.created_at), users.c.email)
+    .ASC()
+)
+```
+
+`ORDER_BY(...)` with a bare expression requires a following `.ASC()` or `.DESC()` before compile/execute.
+
+## Predicates And Set Operations
+```python
+from sqlstratum import EXISTS, SELECT
+
+active_orgs = SELECT(orgs.c.id).FROM(orgs).WHERE(orgs.c.active == 1)
+sub = SELECT(orgs.c.id).FROM(orgs).WHERE(orgs.c.id == users.c.org_id)
+
+q = (
+    SELECT(users.c.id, users.c.email)
+    .FROM(users)
+    .WHERE(
+        users.c.org_id.IN(active_orgs),
+        users.c.age.BETWEEN(18, 65),
+        EXISTS(sub),
+    )
+)
+
+q2 = SELECT(users.c.id).FROM(users).UNION_ALL(SELECT(admins.c.id).FROM(admins))
+```
+
 ## Optional MySQL Execution
 Install optional connectors as needed:
 
@@ -82,9 +143,9 @@ users = Table("users", col("id", int), col("email", str))
 runner = MySQLRunner.connect(
     host="127.0.0.1",
     port=3306,
-    user="orm_admin",
-    password="OrmAdmin456!",
-    database="cities_db",
+    user="app",
+    password="secret",
+    database="appdb",
 )
 
 rows = runner.fetch_all(SELECT(users.c.id, users.c.email).FROM(users))
@@ -93,7 +154,7 @@ print(rows)
 
 URL form is also supported (and mutually exclusive with individual parameters):
 ```python
-runner = MySQLRunner.connect(url="mysql+pymysql://orm_admin:OrmAdmin456!@127.0.0.1:3306/cities_db")
+runner = MySQLRunner.connect(url="mysql+pymysql://app:secret@127.0.0.1:3306/appdb")
 ```
 
 Supported URL forms:
@@ -119,3 +180,7 @@ Note: URL query parameters/fragments are not supported yet.
 
 SQLStratum focuses on queries. DDL statements such as `CREATE TABLE` or `ALTER TABLE` are intended
 to live in a complementary library with similar design goals that is currently in the works.
+
+## Capability Contract
+For a concise matrix of portable vs dialect-specific behavior, see
+[SQL profile](sql-profile.md#capability-contract-matrix).

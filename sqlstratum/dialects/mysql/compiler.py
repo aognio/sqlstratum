@@ -9,7 +9,10 @@ from ...errors import UnsupportedDialectFeatureError
 from ...expr import (
     AliasExpr,
     BinaryPredicate,
+    BetweenPredicate,
+    ExistsPredicate,
     Function,
+    InPredicate,
     Literal,
     LogicalPredicate,
     NotPredicate,
@@ -42,6 +45,8 @@ class _Compiler:
     def compile_query(self, query: Any) -> str:
         if isinstance(query, ast.SelectQuery):
             return self._compile_select(query)
+        if isinstance(query, ast.SetQuery):
+            return self._compile_set(query)
         if isinstance(query, ast.InsertQuery):
             return self._compile_insert(query)
         if isinstance(query, ast.UpdateQuery):
@@ -65,7 +70,20 @@ class _Compiler:
         if query.from_ is not None:
             parts.append("FROM " + self._compile_source(query.from_))
         for join in query.joins:
-            join_sql = "JOIN" if join.kind == "INNER" else "LEFT JOIN"
+            if join.kind == "INNER":
+                join_sql = "JOIN"
+            elif join.kind == "LEFT":
+                join_sql = "LEFT JOIN"
+            elif join.kind == "RIGHT":
+                join_sql = "RIGHT JOIN"
+            elif join.kind == "FULL":
+                raise UnsupportedDialectFeatureError(
+                    "mysql",
+                    "FULL OUTER JOIN",
+                    hint="MySQL does not support FULL OUTER JOIN directly.",
+                )
+            else:
+                raise TypeError(f"Unsupported join type: {join.kind}")
             parts.append(f"{join_sql} {self._compile_source(join.source)} ON {self._compile_predicate(join.on)}")
         if query.where:
             parts.append("WHERE " + self._compile_and_list(query.where))
@@ -73,6 +91,26 @@ class _Compiler:
             parts.append("GROUP BY " + ", ".join(self._compile_expr(e) for e in query.group_by))
         if query.having:
             parts.append("HAVING " + self._compile_and_list(query.having))
+        if query.order_by:
+            parts.append("ORDER BY " + ", ".join(self._compile_order(o) for o in query.order_by))
+        if query.limit is not None:
+            parts.append("LIMIT " + self._bind(query.limit))
+        if query.offset is not None:
+            parts.append("OFFSET " + self._bind(query.offset))
+        return " ".join(parts)
+
+    def _compile_set(self, query: ast.SetQuery) -> str:
+        if query.offset is not None and query.limit is None:
+            raise UnsupportedDialectFeatureError(
+                "mysql",
+                "OFFSET without LIMIT",
+                hint="Use LIMIT(n).OFFSET(m) when compiling for MySQL.",
+            )
+        left_sql = self.compile_query(query.left)
+        right_sql = self.compile_query(query.right)
+        left_operand = f"({left_sql})" if isinstance(query.left, ast.SetQuery) else left_sql
+        right_operand = f"({right_sql})" if isinstance(query.right, ast.SetQuery) else right_sql
+        parts = [f"{left_operand} {query.operator} {right_operand}"]
         if query.order_by:
             parts.append("ORDER BY " + ", ".join(self._compile_order(o) for o in query.order_by))
         if query.limit is not None:
@@ -106,7 +144,7 @@ class _Compiler:
         if isinstance(source, Table):
             return self._compile_table(source)
         if isinstance(source, ast.Subquery):
-            return f"({self._compile_select(source.query)}) AS {self._quote(source.alias)}"
+            return f"({self.compile_query(source.query)}) AS {self._quote(source.alias)}"
         raise TypeError(f"Unsupported source type: {type(source)}")
 
     def _compile_table(self, table: Table) -> str:
@@ -133,7 +171,7 @@ class _Compiler:
         if isinstance(expr, Literal):
             return self._bind(expr.value)
         if isinstance(expr, ast.Subquery):
-            return f"({self._compile_select(expr.query)})"
+            return f"({self.compile_query(expr.query)})"
         return self._compile_predicate(expr)
 
     def _compile_predicate(self, pred: Predicate) -> str:
@@ -146,6 +184,24 @@ class _Compiler:
             return f"({inner})"
         if isinstance(pred, NotPredicate):
             return f"NOT ({self._compile_predicate(pred.predicate)})"
+        if isinstance(pred, InPredicate):
+            not_kw = " NOT" if pred.negated else ""
+            values = pred.values
+            if len(values) == 1 and isinstance(values[0], (ast.SelectQuery, ast.SetQuery)):
+                return f"{self._compile_expr(pred.expr)}{not_kw} IN ({self.compile_query(values[0])})"
+            if not values:
+                return "1=0" if not pred.negated else "1=1"
+            rhs = ", ".join(self._compile_expr(v) for v in values)
+            return f"{self._compile_expr(pred.expr)}{not_kw} IN ({rhs})"
+        if isinstance(pred, BetweenPredicate):
+            not_kw = " NOT" if pred.negated else ""
+            return (
+                f"{self._compile_expr(pred.expr)}{not_kw} BETWEEN "
+                f"{self._compile_expr(pred.low)} AND {self._compile_expr(pred.high)}"
+            )
+        if isinstance(pred, ExistsPredicate):
+            not_kw = "NOT " if pred.negated else ""
+            return f"{not_kw}EXISTS ({self.compile_query(pred.query)})"
         raise TypeError(f"Unsupported predicate type: {type(pred)}")
 
     def _compile_and_list(self, preds: Iterable[Predicate]) -> str:

@@ -33,7 +33,8 @@ class TestCompileDeterminism(unittest.TestCase):
                 users.c.age >= 18,
                 OR(users.c.role == "admin", users.c.role == "owner"),
             )
-            .ORDER_BY(users.c.id.ASC())
+            .ORDER_BY(users.c.id)
+            .ASC()
             .LIMIT(25)
             .OFFSET(0)
         )
@@ -51,7 +52,8 @@ class TestCompileDeterminism(unittest.TestCase):
             .WHERE(orgs.c.active.is_true())
             .GROUP_BY(orgs.c.id, orgs.c.name)
             .HAVING(COUNT(users.c.id) >= 3)
-            .ORDER_BY(COUNT(users.c.id).DESC())
+            .ORDER_BY(COUNT(users.c.id))
+            .DESC()
         )
         first = compile(q)
         for _ in range(25):

@@ -22,9 +22,11 @@ theme:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
+  - SQL Profile: sql-profile.md
   - Dialect Wrappers: dialect-wrappers.md
   - Debugging: debugging.md
   - Hydration: hydration.md
+  - Testing: testing.md
   - Roadmap: roadmap.md
   - Changelog: changelog.md
 markdown_extensions:

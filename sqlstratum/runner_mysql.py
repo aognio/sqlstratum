@@ -69,6 +69,15 @@ def _debug_log(compiled: ast.Compiled, duration_ms: float) -> None:
     )
 
 
+def _resolve_output_shape(query: Any) -> tuple[Any, Any]:
+    if isinstance(query, ast.SelectQuery):
+        return query.projections, query.hydration
+    if isinstance(query, ast.SetQuery):
+        projections, hydration = _resolve_output_shape(query.left)
+        return projections, query.hydration or hydration
+    raise TypeError(f"Query does not produce rows: {type(query)}")
+
+
 def _normalize_rows(cursor: Any, rows: Sequence[Any]) -> list[Mapping[str, Any]]:
     if not rows:
         return []
@@ -138,6 +147,7 @@ class MySQLRunner:
     def fetch_all(self, query: Any) -> list[Any]:
         unwrapped_query, _ = unwrap_query(query, "mysql")
         compiled = compile(unwrapped_query, dialect="mysql")
+        projections, hydration = _resolve_output_shape(unwrapped_query)
         log_enabled = _debug_enabled()
         start = time.perf_counter() if log_enabled else 0.0
         cur = self.connection.cursor()
@@ -145,11 +155,12 @@ class MySQLRunner:
         rows = _normalize_rows(cur, cur.fetchall())
         if log_enabled:
             _debug_log(compiled, (time.perf_counter() - start) * 1000)
-        return hydrate_rows(rows, unwrapped_query.projections, unwrapped_query.hydration or dict)
+        return hydrate_rows(rows, projections, hydration or dict)
 
     def fetch_one(self, query: Any) -> Optional[Any]:
         unwrapped_query, _ = unwrap_query(query, "mysql")
         compiled = compile(unwrapped_query, dialect="mysql")
+        projections, hydration = _resolve_output_shape(unwrapped_query)
         log_enabled = _debug_enabled()
         start = time.perf_counter() if log_enabled else 0.0
         cur = self.connection.cursor()
@@ -159,7 +170,7 @@ class MySQLRunner:
             _debug_log(compiled, (time.perf_counter() - start) * 1000)
         if row is None:
             return None
-        return hydrate_rows([row], unwrapped_query.projections, unwrapped_query.hydration or dict)[0]
+        return hydrate_rows([row], projections, hydration or dict)[0]
 
     def scalar(self, query: Any) -> Optional[Any]:
         unwrapped_query, _ = unwrap_query(query, "mysql")

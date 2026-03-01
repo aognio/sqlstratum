@@ -1,5 +1,30 @@
 # Changelog
 
+## Unreleased
+### Added
+- Added portable predicate support for:
+  - `IN` / `NOT IN`
+  - `BETWEEN` / `NOT BETWEEN`
+  - `EXISTS` / `NOT EXISTS`
+- Added set operations:
+  - `UNION`
+  - `UNION ALL`
+  - `INTERSECT`
+  - `EXCEPT`
+- Added explicit ordering wrapper functions:
+  - `ASC(expr)`
+  - `DESC(expr)`
+- Added SQL profile documentation page (`docs/sql-profile.md`).
+- Added dialect capability contract tests (`tests/test_dialect_capabilities_contract.py`).
+- Added opt-in real MySQL integration tests for sync/async runners (`tests/test_mysql_integration_real.py`).
+- Added GitHub Actions CI workflow to run tests, docs build, package build, and `twine check`.
+
+### Changed
+- Added `RIGHT_JOIN` and `FULL_JOIN` DSL APIs with dialect capability guardrails.
+- Updated docs to make `ORDER_BY(DESC(...), ASC(...))` the primary ordering style.
+- Enforced MySQL `OFFSET`-without-`LIMIT` guardrail consistently for set queries.
+- Documented cross-dialect capability contract in README and SQL profile docs.
+
 ## 0.3.2 - 2026-02-25
 ### Added
 - Added explicit dialect wrappers:

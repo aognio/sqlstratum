@@ -7,13 +7,19 @@ layer with composable SQL, predictable parameter binding, and explicit execution
 ## Highlights
 - Deterministic SQL compilation for identical AST inputs
 - Typed, composable DSL for SELECT/INSERT/UPDATE/DELETE
+- Portable predicates: `IN`, `NOT IN`, `BETWEEN`, `NOT BETWEEN`, `EXISTS`, `NOT EXISTS`
+- Set operations: `UNION`, `UNION ALL`, `INTERSECT`, `EXCEPT`
 - Safe parameter binding (no raw interpolation)
 - Hydration targets for structured results
 - SQLite runner plus initial MySQL sync/async runners
 - Dialect-aware compilation (`sqlite`, `mysql`)
+- Explicit dialect capability contract and guardrails
+- Opt-in real MySQL integration test coverage for runners
 
 Get started in a few minutes:
 - [Getting started](getting-started.md)
+- [SQL profile](sql-profile.md)
 - [Dialect wrappers](dialect-wrappers.md)
 - [Hydration](hydration.md)
 - [Debugging](debugging.md)
+- [Testing](testing.md)

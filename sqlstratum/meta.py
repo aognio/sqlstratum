@@ -60,15 +60,6 @@ class Column(Expr):
         from .expr import BinaryPredicate, Literal
         return BinaryPredicate(self, "=", Literal(False))
 
-    def ASC(self) -> "OrderSpec":
-        from .expr import OrderSpec
-        return OrderSpec(self, "ASC")
-
-    def DESC(self) -> "OrderSpec":
-        from .expr import OrderSpec
-        return OrderSpec(self, "DESC")
-
-
 class Table:
     def __init__(self, name: str, *columns: Column, alias: Optional[str] = None, columns_list: Optional[Iterable[Column]] = None):
         self.name = name
