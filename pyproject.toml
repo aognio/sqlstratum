@@ -4,10 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sqlstratum"
-version = "0.3.2"
+version = "0.4.0"
 description = "Lightweight, source-first SQL AST + compiler + runner."
 readme = { file = "README.md", content-type = "text/markdown" }
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
   { name = "Antonio Ognio", email = "aognio@gmail.com" },
 ]
@@ -15,7 +16,6 @@ keywords = ["sql", "query-builder", "sqlite", "compiler", "ast"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.8",
@@ -45,22 +45,26 @@ pydantic = [
 ]
 pymysql = [
   "PyMySQL>=1.1",
+  "cryptography>=41",
 ]
 asyncmy = [
   "asyncmy>=0.2",
+  "cryptography>=41",
 ]
 mysql = [
   "PyMySQL>=1.1",
   "asyncmy>=0.2",
+  "cryptography>=41",
 ]
 
 [tool.setuptools.packages.find]
 include = ["sqlstratum*"]
 
 [tool.poe.tasks]
+release-clean.cmd = "python scripts/clean_release_artifacts.py"
 release-build.cmd = "python -m build --no-isolation"
 release-check.cmd = "python -m twine check dist/*"
 release-test.cmd = "python -m unittest"
-release-dry-run.sequence = ["release-test", "release-build", "release-check"]
+release-dry-run.sequence = ["release-test", "release-clean", "release-build", "release-check"]
 release-upload.cmd = "python -m twine upload dist/*"
 release.sequence = ["release-dry-run", "release-upload"]

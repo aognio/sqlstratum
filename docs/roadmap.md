@@ -25,18 +25,27 @@ support. The roadmap below is incremental, with explicit layering preserved (AST
 - Added dialect-binding guardrails and chain-friendly wrapper behavior.
 - Expanded interaction test coverage for wrappers with compile, runners, and hydration.
 
+### 0.4.0 (Shipped)
+- Added portable predicates (`IN`, `NOT IN`, `BETWEEN`, `NOT BETWEEN`, `EXISTS`, `NOT EXISTS`).
+- Added set operations (`UNION`, `UNION ALL`, `INTERSECT`, `EXCEPT`).
+- Added explicit ordering wrappers (`ASC(...)`, `DESC(...)`) and kept the fluent ordering style working.
+- Added `RIGHT_JOIN` and `FULL_JOIN` DSL APIs with dialect capability guardrails.
+- Expanded dialect capability contract coverage, SQL profile documentation, and opt-in real MySQL integration tests.
+- Hardened packaging and connector ergonomics:
+  - MySQL extras include auth dependencies needed for common MySQL 8 setups
+  - release validation remains green through tests, build, docs, and `twine check`
+
 ## Multi-Dialect Start
 
-### 0.4.0 (Feature, PostgreSQL MVP Start)
-- Introduce PostgreSQL dialect compiler MVP behind dialect namespace.
-- Focus on SELECT/INSERT/UPDATE/DELETE parity for core DSL constructs.
-- Keep hydration and runner boundaries unchanged.
+### 0.5.0 (Current target, PostgreSQL Compiler MVP)
+- Add PostgreSQL compiler adapter with deterministic parameter binding.
+- Add dialect capability matrix updates and compile snapshot tests for PostgreSQL.
+- Preserve architecture boundaries:
+  - AST/compile deterministic core
+  - runner execution boundary
+  - hydration post-execution layer
 
-### 0.4.1 (Patch)
-- Add PostgreSQL compile snapshots and compatibility fixes.
-- Improve docs and migration guidance for early adopters.
-
-### 0.5.0 (Feature, MySQL Hardening)
+### 0.6.0 (Feature, MySQL Hardening)
 - Expand MySQL execution integration coverage across real server scenarios.
 - Improve connector parity and error semantics across sync/async runners.
 - Continue keeping dialect-specific behavior out of core abstractions.

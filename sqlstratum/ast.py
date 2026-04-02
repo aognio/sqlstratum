@@ -31,8 +31,19 @@ class SelectQuery:
 
 
 @dataclass(frozen=True)
+class SetQuery:
+    left: Any
+    operator: str  # UNION, UNION ALL, INTERSECT, EXCEPT
+    right: Any
+    order_by: Tuple[OrderSpec, ...]
+    limit: Optional[int]
+    offset: Optional[int]
+    hydration: HydrationTarget
+
+
+@dataclass(frozen=True)
 class Join:
-    kind: str  # "INNER" or "LEFT"
+    kind: str  # "INNER", "LEFT", "RIGHT", "FULL"
     source: Source
     on: Predicate
 
@@ -58,7 +69,7 @@ class DeleteQuery:
 
 @dataclass(frozen=True)
 class Subquery:
-    query: SelectQuery
+    query: Any
     alias: str
     c: Any = None
 

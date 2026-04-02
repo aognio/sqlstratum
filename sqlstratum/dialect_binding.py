@@ -11,7 +11,14 @@ from . import ast
 def _is_query_object(value: Any) -> bool:
     return isinstance(
         value,
-        (ast.SelectQuery, ast.InsertQuery, ast.UpdateQuery, ast.DeleteQuery, ast.Subquery),
+        (
+            ast.SelectQuery,
+            ast.SetQuery,
+            ast.InsertQuery,
+            ast.UpdateQuery,
+            ast.DeleteQuery,
+            ast.Subquery,
+        ),
     )
 
 
@@ -65,5 +72,11 @@ def unwrap_query(query: Any, dialect: str) -> Tuple[Any, str]:
             f"query bound to dialect '{bound}'",
             hint=f"Compile/execute this query with dialect='{bound}'.",
         )
+
+    if hasattr(current, "__sqlstratum_order_pending__"):
+        raise ValueError("ORDER_BY requires an explicit direction via .ASC() or .DESC().")
+
+    if hasattr(current, "__sqlstratum_query__"):
+        current = current.__sqlstratum_query__()
 
     return current, bound or requested

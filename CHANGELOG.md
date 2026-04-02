@@ -1,5 +1,42 @@
 # Changelog
 
+## Unreleased
+### Added
+- Expanded MySQL compiler, runner, and real-server integration coverage across set queries, scalar/fetch-one paths, debug logging, and transaction behavior.
+- Added narrative `0.4.0` release notes in `LATEST-RELEASE.md` and `docs/latest-release.md` with example-heavy walkthroughs.
+
+## 0.4.0 - 2026-04-02
+See `LATEST-RELEASE.md` for a non-normative prose walkthrough of this release with extended examples.
+
+### Added
+- Added portable predicate support for:
+  - `IN` / `NOT IN`
+  - `BETWEEN` / `NOT BETWEEN`
+  - `EXISTS` / `NOT EXISTS`
+- Added set operations:
+  - `UNION`
+  - `UNION ALL`
+  - `INTERSECT`
+  - `EXCEPT`
+- Added explicit ordering wrapper functions:
+  - `ASC(expr)`
+  - `DESC(expr)`
+- Added SQL profile documentation page (`docs/sql-profile.md`).
+- Added dialect capability contract tests (`tests/test_dialect_capabilities_contract.py`).
+- Added opt-in real MySQL integration tests for sync/async runners (`tests/test_mysql_integration_real.py`).
+- Added GitHub Actions CI workflow to run tests, docs build, package build, and `twine check`.
+
+### Changed
+- Added `RIGHT_JOIN` and `FULL_JOIN` DSL APIs with dialect capability guardrails.
+- Updated docs to make `ORDER_BY(DESC(...), ASC(...))` the primary ordering style.
+- Enforced MySQL `OFFSET`-without-`LIMIT` guardrail consistently for set queries.
+- Fixed MySQL set-query `ORDER BY` rendering to use output columns in global order clauses.
+- Documented cross-dialect capability contract in README and SQL profile docs.
+- Added `cryptography` to MySQL optional dependency groups so MySQL 8 auth works with the documented extras.
+- Improved MySQL sync/async runner connection errors to point directly at the required install when auth fails.
+- Cleaned release artifacts before `poe release` builds/checks so upload targets only the current version.
+- Updated package license metadata to use SPDX-style configuration compatible with current setuptools guidance.
+
 ## 0.3.2 - 2026-02-25
 ### Added
 - Added explicit dialect wrappers:

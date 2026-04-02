@@ -23,7 +23,8 @@ class TestCompileAggregate(unittest.TestCase):
             .FROM(orgs)
             .JOIN(users, ON=users.c.org_id == orgs.c.id)
             .GROUP_BY(orgs.c.id, orgs.c.name)
-            .ORDER_BY(COUNT(users.c.id).DESC())
+            .ORDER_BY(COUNT(users.c.id))
+            .DESC()
         )
         compiled = compile(q)
         self.assertEqual(

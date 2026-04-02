@@ -2,7 +2,9 @@ import importlib
 import unittest
 from unittest import mock
 
+from sqlstratum import SELECT, Table, col
 from sqlstratum.hydrate import pydantic as pydantic_hydrate
+from sqlstratum.runner import SQLiteRunner
 
 
 class TestPydanticHydration(unittest.TestCase):
@@ -73,6 +75,29 @@ class TestPydanticHydration(unittest.TestCase):
         self.assertIsInstance(hydrated, User)
         self.assertEqual(hydrated.id, 2)
         self.assertEqual(hydrated.email, "b@c.com")
+
+    def test_using_pydantic_with_sqlite_runner(self):
+        try:
+            pydantic = importlib.import_module("pydantic")
+        except Exception:
+            self.skipTest("Pydantic not installed")
+
+        class User(pydantic.BaseModel):
+            id: int
+            email: str
+
+        users = Table("users", col("id", int), col("email", str))
+        runner = SQLiteRunner.connect(path=":memory:")
+        try:
+            runner.exec_ddl("CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT)")
+            runner.exec_ddl("INSERT INTO users (id, email) VALUES (1, 'a@b.com')")
+            q = pydantic_hydrate.using_pydantic(SELECT(users.c.id, users.c.email).FROM(users)).hydrate(User)
+            row = runner.fetch_one(q)
+            self.assertIsInstance(row, User)
+            self.assertEqual(row.id, 1)
+            self.assertEqual(row.email, "a@b.com")
+        finally:
+            runner.connection.close()
 
 
 if __name__ == "__main__":

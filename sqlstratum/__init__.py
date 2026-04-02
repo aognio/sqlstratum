@@ -1,6 +1,6 @@
 """sqlstratum: minimal SQL AST + compiler + sqlite runner."""
 from .dsl import SELECT, INSERT, UPDATE, DELETE, OR, AND, NOT
-from .expr import COUNT, SUM, AVG, MIN, MAX
+from .expr import COUNT, SUM, AVG, MIN, MAX, ASC, DESC, EXISTS, NOT_EXISTS
 from .meta import Table, Column, col
 from .compile import compile
 from .dialects import list_dialects
@@ -25,6 +25,10 @@ __all__ = [
     "AVG",
     "MIN",
     "MAX",
+    "ASC",
+    "DESC",
+    "EXISTS",
+    "NOT_EXISTS",
     "using_mysql",
     "using_sqlite",
     "TOTAL",

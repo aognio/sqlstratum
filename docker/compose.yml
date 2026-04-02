@@ -1,0 +1,45 @@
+name: sqlstratum-local
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: sqlstratum-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: sqlstratum_it
+      MYSQL_USER: sqlstratum
+      MYSQL_PASSWORD: sqlstratum_pass
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-prootpass"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # postgres:
+  #   image: postgres:16
+  #   container_name: sqlstratum-postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: sqlstratum_it
+  #     POSTGRES_USER: sqlstratum
+  #     POSTGRES_PASSWORD: sqlstratum_pass
+  #   ports:
+  #     - "5432:5432"
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U sqlstratum -d sqlstratum_it"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 20
+  #     start_period: 20s
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  mysql_data:
+  # postgres_data:

@@ -4,16 +4,12 @@ from __future__ import annotations
 from typing import Any, Callable, Dict, Optional, Protocol, TYPE_CHECKING, runtime_checkable, TypeVar
 
 if TYPE_CHECKING:
-    from .expr import AliasExpr, BinaryPredicate, LogicalPredicate, NotPredicate, OrderSpec, UnaryPredicate
+    from .expr import AliasExpr, BinaryPredicate, LogicalPredicate, NotPredicate, UnaryPredicate
 
 
 @runtime_checkable
 class Expression(Protocol):
     def AS(self, alias: str) -> "AliasExpr": ...
-
-    def ASC(self) -> "OrderSpec": ...
-
-    def DESC(self) -> "OrderSpec": ...
 
     def __eq__(self, other: Any) -> "BinaryPredicate": ...
 
